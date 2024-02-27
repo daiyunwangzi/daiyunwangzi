@@ -1,0 +1,61 @@
+import argparse
+import json
+import requests
+
+# 您的 Bot Token
+token = 'Bot Token'
+
+# 设置命令行参数
+parser = argparse.ArgumentParser(description='发送 Telegram 消息')
+parser.add_argument('--id', help='Chat ID')
+parser.add_argument('--img', help='Image URL')
+parser.add_argument('--wb', help='Caption')
+parser.add_argument('--anniu', help='Buttons JSON')
+
+# 解析命令行参数
+args = parser.parse_args()
+emoji_dict = {
+    "(点赞)": "👍",
+    "(右手)": "👉",
+    "(左手)": "👈",
+    "(爱心)": "❤️",
+    "(嘴巴)": "💋",
+    "(拳头)": "👊",
+    "(零零)": "0️⃣",
+    "(一一)": "1️⃣",
+    "(二二)": "2️⃣",
+    "(三三)": "3️⃣",
+    "(四四)": "4️⃣",
+    "(五五)": "5️⃣",
+    "(六六)": "6️⃣",
+    "(七七)": "7️⃣",
+    "(八八)": "8️⃣",
+    "(九九)": "9️⃣",
+    "(十十)": "🔟"
+}
+
+
+for word, emoji in emoji_dict.items():
+    args.anniu = args.anniu.replace(word, emoji)
+for word, emoji in emoji_dict.items():
+    args.wb = args.wb.replace(word, emoji)
+
+# 将字符串中的 '#' 替换为引号，并解析 JSON
+inline_keyboard = json.loads(args.anniu.replace('#', '\"'))
+
+# 构建 JSON 数据
+data = {
+    "chat_id": args.id,
+    "photo": args.img,
+    "caption": args.wb.replace('\\n', '\n'),
+    "reply_markup": json.dumps({"inline_keyboard": inline_keyboard})
+}
+print(data)
+# 发送 POST 请求
+response = requests.post(f'https://api.telegram.org/bot{token}/sendPhoto', data=data)
+
+
+# 输出响应
+print(response.text)
+
+
